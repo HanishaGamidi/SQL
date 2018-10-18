@@ -1,0 +1,202 @@
+package com.capgemini.test;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import com.capgemini.beans.Account;
+import com.capgemini.exceptions.InsufficientOpeningBalanceException;
+import com.capgemini.repository.AccountRepository;
+import com.capgemini.service.AccountService;
+import com.capgemini.service.AccountServiceImpl;
+
+public class AccountTest {
+
+AccountService accountService;
+	
+	@Mock
+	AccountRepository accountRepository;
+	@Before
+	public void setUp() throws Exception {
+		MockitoAnnotations.initMocks(this);
+		
+		accountService = new AccountServiceImpl(accountRepository);
+	}
+
+	/*
+	 * create account
+	 * 1.when the amount is less than 500 then system should throw exception
+	 * 2.when the valid info is passed account should be created successfully
+	 */
+	
+	@Test(expected=com.capgemini.exceptions.InsufficientOpeningBalanceException.class)
+	public void whenTheAmountIsLessThan500SystemShouldThrowException() throws InsufficientOpeningBalanceException 
+	{
+		accountService.createAccount(101, 400);
+	}
+	
+	@Test
+	public void whenTheValidInfoIsPassedAccountShouldBeCreatedSuccessfully() throws InsufficientOpeningBalanceException
+	{
+		Account account =new Account();
+		account.setAccountNumber(101);
+		account.setAmount(5000);
+		when(accountRepository.save(account)).thenReturn(true);
+		assertEquals(account, accountService.createAccount(101, 5000));
+	}
+
+
+}
+
+
+package com.capgemini.repository;
+
+import com.capgemini.beans.Account;
+
+public interface AccountRepository {
+
+boolean save(Account account);
+	
+	Account searchAccount(int accountNumber);
+
+}
+
+
+
+package com.capgemini.service;
+
+import com.capgemini.beans.Account;
+import com.capgemini.exceptions.InsufficientBalanceException;
+import com.capgemini.exceptions.InsufficientOpeningBalanceException;
+import com.capgemini.exceptions.InvalidAccountNumberException;
+
+public interface AccountService {
+
+	
+	Account createAccount(int accountNumber, int amount) throws InsufficientOpeningBalanceException;
+	
+	 Account withdrawAmount(int accountNumber,int amount) throws InvalidAccountNumberException, InsufficientBalanceException;
+}
+
+
+package com.capgemini.service;
+
+import com.capgemini.beans.Account;
+import com.capgemini.exceptions.InsufficientBalanceException;
+import com.capgemini.exceptions.InsufficientOpeningBalanceException;
+import com.capgemini.exceptions.InvalidAccountNumberException;
+import com.capgemini.repository.AccountRepository;
+
+/*import Exception.InsufficientBalanceException;
+import Exception.InvalidAccountNumberException;
+*/
+public class AccountServiceImpl implements AccountService {
+	
+	AccountRepository accountRepository;
+	
+	
+	public AccountServiceImpl(AccountRepository accountRepository) {
+		super();
+		this.accountRepository = accountRepository;
+	}
+
+	
+	
+	public Account createAccount(int accountNumber,int amount) throws  InsufficientOpeningBalanceException
+	{
+		
+		if(amount<500)
+		{
+			throw new InsufficientOpeningBalanceException();
+		}
+		
+		Account account = new Account();
+		account.setAccountNumber(accountNumber);
+	    account.setAmount(amount);
+		 
+		if(accountRepository.save(account))
+		{
+			return account;
+		}
+	     
+		return null;
+		
+	}
+	 /*public Account withdrawAmount(int accountNumber,int amount) throws InvalidAccountNumberException, InsufficientBalanceException
+	    {
+	       
+	        if((account.getAmount()-amount)>=0)
+	        {	
+	        	 Account account=new Account();
+	        
+	            account.setAmount(account.getAmount()-amount);
+	            
+	           if(accountRepository.save(account)){
+	        	   
+	              return account.getAmount();
+	        }
+	        
+	        throw new InsufficientBalanceException();
+	    }
+}*/
+
+
+
+	@Override
+	public Account withdrawAmount(int accountNumber, int amount)
+			throws InvalidAccountNumberException, InsufficientBalanceException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}
+
+
+package com.capgemini.beans;
+
+public class Account {
+
+	private int accountNumber;
+	private int amount;
+
+	
+	public int getAccountNumber() {
+		return accountNumber;
+	}
+	public void setAccountNumber(int accountNumber) {
+		this.accountNumber = accountNumber;
+	}
+	public int getAmount() {
+		return amount;
+	}
+	public void setAmount(int amount) {
+		this.amount = amount;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + accountNumber;
+		result = prime * result + amount;
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Account other = (Account) obj;
+		if (accountNumber != other.accountNumber)
+			return false;
+		if (amount != other.amount)
+			return false;
+		return true;
+	}
+	
+}
