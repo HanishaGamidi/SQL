@@ -1,5 +1,4 @@
-Student.java
-
+Student.java 
 package com.capgemini.bean;
 
 public class Student {
@@ -46,9 +45,7 @@ public class Student {
 }	
 	
 
-
 StudentSchedular.java
-
 package com.capgemini.service;
 
 import com.capgemini.bean.Student;
@@ -156,7 +153,6 @@ public class StudentSchedular {
  
 
 Admin.java
-
 package com.capgemini.view;
 
 import java.util.Scanner;
@@ -294,9 +290,3 @@ public class Admin {
   	}
   		
   }
-
-
-
-
-
-
